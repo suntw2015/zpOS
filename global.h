@@ -120,7 +120,7 @@ static inline u8 inb(u16 port)
 	return value;
 }
 
-static inline reload_gdt(gdt_descriptor_t* descriptor)
+static inline void reload_gdt(gdt_descriptor_t* descriptor)
 {
 	__asm__ volatile (
         "lgdt %0\n"
@@ -129,7 +129,7 @@ static inline reload_gdt(gdt_descriptor_t* descriptor)
     );
 }
 
-static inline reload_idt(idt_descriptor_t* descriptor)
+static inline void reload_idt(idt_descriptor_t* descriptor)
 {
 	__asm__ volatile (
         "lidt (%0)\n"
@@ -138,7 +138,7 @@ static inline reload_idt(idt_descriptor_t* descriptor)
     );
 }
 
-static inline iret()
+static inline void iret()
 {
 	__asm__ volatile(
 		"iret"
