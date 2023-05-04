@@ -20,6 +20,8 @@ int main() {
     kernelConfig.screenMaxCol = 80;
     kernelConfig.screenMaxRow = 50;
 
+    init_gdt();
+    init_idt();
     init_memery();
     init_interrrupt();
 
@@ -29,6 +31,72 @@ int main() {
     };
 
     return 0;
+}
+
+void init_gdt()
+{
+    // 初始化代码段选择子
+    gdt_table[0].limit_low = 0xffff;
+    gdt_table[0].base_low = 0x0000;
+    gdt_table[0].base_mid = 0x00;
+    gdt_table[0].access = 0x9a;
+    gdt_table[0].granularity = 0xcf;
+    gdt_table[0].base_high = 0x00;
+
+    // 初始化数据段选择子
+    gdt_table[1].limit_low = 0xffff;
+    gdt_table[1].base_low = 0x0000;
+    gdt_table[1].base_mid = 0x00;
+    gdt_table[1].access = 0x92;
+    gdt_table[1].granularity = 0xcf;
+    gdt_table[1].base_high = 0x00;
+
+    // 初始化GDT表界限和基地址
+    gdt_table[2].limit_low = sizeof(gdt_table) - 1;
+    gdt_table[2].base_low = (u32)&gdt_table;
+    gdt_table[2].base_mid = ((u32)&gdt_table) >> 16;
+    gdt_table[2].access = 0x80;
+    gdt_table[2].granularity = 0x00;
+    gdt_table[2].base_high = ((u32)&gdt_table) >> 24;
+
+   //初始化gdt描述符
+    gdt_descriptor.limit = sizeof(gdt_table)-1;
+    gdt_descriptor.base = (u32)&gdt_table;
+
+    // 装载GDT表
+    reload_gdt(&gdt_descriptor);
+}
+
+// 定义中断处理函数
+void divide_error_handler() {
+    log("divide_error_handler");
+    iret();
+}
+
+void page_fault_handler() {
+    // 处理页面错误异常
+    log("page_fault_handler");
+    iret();
+}
+
+void init_idt()
+{
+    // 初始化除0异常中断描述符
+    idt_table[0].offset_low = (u32)divide_error_handler & 0xffff;
+    idt_table[0].selector = 0x08;   // 代码段选择子
+    idt_table[0].zero = 0;
+    idt_table[0].type_attr = 0x8e;  // 中断类型为14（除0异常），特权级为0
+
+    // 初始化页面错误异常中断描述符
+    idt_table[14].offset_low = (u32)page_fault_handler & 0xffff;
+    idt_table[14].selector = 0x08;  // 代码段选择子
+    idt_table[14].zero = 0;
+    idt_table[14].type_attr = 0x8e; // 中断类型为14（页面错误异常），特权级为0
+
+    // 初始化IDT表界限和基地址
+    idt_descriptor.limit = sizeof(idt_table) - 1;
+    idt_descriptor.base = (u32)&idt_table;
+    reload_idt(&idt_descriptor);
 }
 
 void init_interrrupt()

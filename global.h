@@ -66,25 +66,39 @@ extern KernelConfig kernelConfig;
 
 //IDT结构
 typedef struct {
-    u16 lowOffset; //低16位
-    u16 selector; //段选择子
-    u8 dcount;
-    u8 attr; //p(1) DPL(2) DT(1) TYPE(4)
-    u16 highOffset; //高16位
-} IDT;
-extern IDT idt[IDT_COUNT];
+    u16 offset_low;    // 中断处理函数地址低16位
+    u16 selector;      // 中断处理函数代码段选择子
+    u8 zero;           // 保留位，必须为0
+    u8 type_attr;      // 中断描述符属性
+    u16 offset_high;   // 中断处理函数地址高16位
+} __attribute__((packed)) idt_table_entry;
+extern idt_table_entry idt_table[IDT_COUNT];
+
+//IDT描述符结构
+typedef struct {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed)) idt_descriptor_t;
+extern idt_descriptor_t idt_descriptor;
+
+//GDT描述符结构
+typedef struct {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed)) gdt_descriptor_t;
 
 //GDT结构
 typedef struct
 {
-	u16	lowLimit;		/* Limit */
-	u16	lowBase;		/* Base */
-	u8	midBase;		/* Base */
-	u8	attr1;			/* P(1) DPL(2) DT(1) TYPE(4) */
-	u8	limitHighAttr2;	/* G(1) D(1) 0(1) AVL(1) LimitHigh(4) */
-	u8	highBase;		/* Base */
-}GDT;
-extern  GDT gdt[GDT_COUNT];
+	u16 limit_low;     // GDT表界限低16位
+    u16 base_low;      // GDT表基地址低16位
+    u8 base_mid;       // GDT表基地址中间8位
+    u8 access;         // GDT描述符访问标志
+    u8 granularity;    // GDT描述符粒度标志
+    u8 base_high;      // GDT表基地址高8位
+}__attribute__((packed)) gdt_table_entry;
+extern gdt_table_entry gdt_table[GDT_COUNT];
+extern gdt_descriptor_t gdt_descriptor;
 
 typedef	void (*interruptHandler) ();
 
@@ -104,6 +118,31 @@ static inline u8 inb(u16 port)
 	u8 value;
 	__asm__ volatile("inb %1,%0" : "=a" (value) : "dN" (port));
 	return value;
+}
+
+static inline reload_gdt(gdt_descriptor* descriptor)
+{
+	__asm__ volatile (
+        "lgdt %0\n"
+        :
+        : "m"(*descriptor)
+    );
+}
+
+static inline reload_idt(idt_descriptor_t* descriptor)
+{
+	__asm__ volatile (
+        "lidt (%0)\n"
+        :
+        : "r"(&descriptor)
+    );
+}
+
+static inline iret()
+{
+	__asm__ volatile(
+		"iret"
+	);
 }
 
 #endif
