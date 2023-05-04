@@ -2,6 +2,10 @@
 #include "string.h"
 
 KernelConfig kernelConfig;
+idt_table_entry idt_table[IDT_COUNT];
+idt_descriptor_t idt_descriptor;
+gdt_table_entry gdt_table[GDT_COUNT];
+gdt_descriptor_t gdt_descriptor;
 
 void init_console();
 void init_heap();

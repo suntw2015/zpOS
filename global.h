@@ -72,14 +72,12 @@ typedef struct {
     u8 type_attr;      // 中断描述符属性
     u16 offset_high;   // 中断处理函数地址高16位
 } __attribute__((packed)) idt_table_entry;
-extern idt_table_entry idt_table[IDT_COUNT];
 
 //IDT描述符结构
 typedef struct {
     u16 limit;
     u32 base;
 } __attribute__((packed)) idt_descriptor_t;
-extern idt_descriptor_t idt_descriptor;
 
 //GDT描述符结构
 typedef struct {
@@ -97,8 +95,6 @@ typedef struct
     u8 granularity;    // GDT描述符粒度标志
     u8 base_high;      // GDT表基地址高8位
 }__attribute__((packed)) gdt_table_entry;
-extern gdt_table_entry gdt_table[GDT_COUNT];
-extern gdt_descriptor_t gdt_descriptor;
 
 typedef	void (*interruptHandler) ();
 
