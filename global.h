@@ -76,15 +76,15 @@ extern idt_table_entry idt_table[IDT_COUNT];
 
 //IDT描述符结构
 typedef struct {
-    uint16_t limit;
-    uint32_t base;
+    u16 limit;
+    u32 base;
 } __attribute__((packed)) idt_descriptor_t;
 extern idt_descriptor_t idt_descriptor;
 
 //GDT描述符结构
 typedef struct {
-    uint16_t limit;
-    uint32_t base;
+    u16 limit;
+    u32 base;
 } __attribute__((packed)) gdt_descriptor_t;
 
 //GDT结构
@@ -120,7 +120,7 @@ static inline u8 inb(u16 port)
 	return value;
 }
 
-static inline reload_gdt(gdt_descriptor* descriptor)
+static inline reload_gdt(gdt_descriptor_t* descriptor)
 {
 	__asm__ volatile (
         "lgdt %0\n"

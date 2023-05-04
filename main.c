@@ -9,6 +9,11 @@ void init_kernel();
 void init_memery();
 void init_video();
 void log(char *s);
+void init_gdt();
+void init_idt();
+void divide_error_handler();
+void page_fault_handler();
+
 
 int main() {
     char *video = (char*)0xB8000;
@@ -23,7 +28,6 @@ int main() {
     init_gdt();
     init_idt();
     init_memery();
-    init_interrrupt();
 
     int a =1/0;
 
@@ -97,11 +101,6 @@ void init_idt()
     idt_descriptor.limit = sizeof(idt_table) - 1;
     idt_descriptor.base = (u32)&idt_table;
     reload_idt(&idt_descriptor);
-}
-
-void init_interrrupt()
-{
-    
 }
 
 void init_console()
