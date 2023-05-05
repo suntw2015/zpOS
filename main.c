@@ -29,10 +29,14 @@ int main() {
     kernelConfig.screenMaxCol = 80;
     kernelConfig.screenMaxRow = 50;
 
+    log("init gdt");
     init_gdt();
+    log("init idt");
     init_idt();
+    log("init idt finish");
     init_memery();
 
+    log("div");
     int a =1/0;
 
     while (1) {
@@ -43,29 +47,32 @@ int main() {
 
 void init_gdt()
 {
-    // 初始化代码段选择子
-    gdt_table[0].limit_low = 0xffff;
-    gdt_table[0].base_low = 0x0000;
-    gdt_table[0].base_mid = 0x00;
-    gdt_table[0].access = 0x9a;
-    gdt_table[0].granularity = 0xcf;
-    gdt_table[0].base_high = 0x00;
+    //空占位
+    memset(&gdt_table[0], 0, 8);
 
-    // 初始化数据段选择子
+    // 初始化代码段选择子
     gdt_table[1].limit_low = 0xffff;
     gdt_table[1].base_low = 0x0000;
     gdt_table[1].base_mid = 0x00;
-    gdt_table[1].access = 0x92;
+    gdt_table[1].access = 0x9a;
     gdt_table[1].granularity = 0xcf;
     gdt_table[1].base_high = 0x00;
 
+    // 初始化数据段选择子
+    gdt_table[2].limit_low = 0xffff;
+    gdt_table[2].base_low = 0x0000;
+    gdt_table[2].base_mid = 0x00;
+    gdt_table[2].access = 0x92;
+    gdt_table[2].granularity = 0xcf;
+    gdt_table[2].base_high = 0x00;
+
     // 初始化GDT表界限和基地址
-    gdt_table[2].limit_low = sizeof(gdt_table) - 1;
-    gdt_table[2].base_low = (u32)&gdt_table;
-    gdt_table[2].base_mid = ((u32)&gdt_table) >> 16;
-    gdt_table[2].access = 0x80;
-    gdt_table[2].granularity = 0x00;
-    gdt_table[2].base_high = ((u32)&gdt_table) >> 24;
+    gdt_table[3].limit_low = sizeof(gdt_table) - 1;
+    gdt_table[3].base_low = (u32)&gdt_table;
+    gdt_table[3].base_mid = ((u32)&gdt_table) >> 16;
+    gdt_table[3].access = 0x80;
+    gdt_table[3].granularity = 0x00;
+    gdt_table[3].base_high = ((u32)&gdt_table) >> 24;
 
    //初始化gdt描述符
     gdt_descriptor.limit = sizeof(gdt_table)-1;

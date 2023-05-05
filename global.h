@@ -1,7 +1,7 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define GDT_COUNT 255
+#define GDT_COUNT 3
 #define IDT_COUNT 255
 
 /* 中断向量 */
