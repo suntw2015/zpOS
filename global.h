@@ -121,7 +121,7 @@ static inline void reload_gdt(gdt_descriptor_t* descriptor)
 	__asm__ volatile (
         "lgdt %0\n"
         :
-        : "m"(*descriptor)
+        : "m"(descriptor)
     );
 }
 
@@ -130,7 +130,7 @@ static inline void reload_idt(idt_descriptor_t* descriptor)
 	__asm__ volatile (
         "lidt (%0)\n"
         :
-        : "r"(&descriptor)
+        : "r"(descriptor)
     );
 }
 
