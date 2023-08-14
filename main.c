@@ -1,5 +1,6 @@
 #include "global.h"
 #include "string.h"
+#include "console.h"
 
 KernelConfig kernelConfig;
 idt_table_entry idt_table[IDT_COUNT];
@@ -12,7 +13,6 @@ void init_heap();
 void init_kernel();
 void init_memery();
 void init_video();
-void log(char *s);
 void init_gdt();
 void init_idt();
 void divide_error_handler();
@@ -20,24 +20,10 @@ void page_fault_handler();
 
 
 int main() {
-    char *video = (char*)0xB8000;
 
-    *video = 'S';
-
-    kernelConfig.cursorCurrentCol = 0;
-    kernelConfig.cursorCurrentRow = 0;
-    kernelConfig.screenMaxCol = 80;
-    kernelConfig.screenMaxRow = 50;
-
-    log("init gdt");
-    init_gdt();
-    log("init idt");
-    init_idt();
-    log("init idt finish");
-    init_memery();
-
-    log("div");
-    int a =1/0;
+    prints("Hello world");
+    prints("Zo OS\n");
+    prints("aaa");
 
     while (1) {
     };
@@ -48,7 +34,12 @@ int main() {
 void init_gdt()
 {
     //空占位
-    memset(&gdt_table[0], 0, 8);
+    gdt_table[0].limit_low = 0x0000;
+    gdt_table[0].base_low = 0x0000;
+    gdt_table[0].base_mid = 0x00;
+    gdt_table[0].access = 0x90;
+    gdt_table[0].granularity = 0x00;
+    gdt_table[0].base_high = 0x00;
 
     // 初始化代码段选择子
     gdt_table[1].limit_low = 0xffff;
@@ -84,13 +75,11 @@ void init_gdt()
 
 // 定义中断处理函数
 void divide_error_handler() {
-    log("divide_error_handler");
     iret();
 }
 
 void page_fault_handler() {
     // 处理页面错误异常
-    log("page_fault_handler");
     iret();
 }
 
@@ -138,17 +127,17 @@ void init_memery()
 
     MemoryArds *ards = 0x7e01;
     for (int i=0;i<count;i++) {
-        ards = 0x7e01 + i*20;
-        memset(a, 0, 100);
-        strcat(a, "base:");
-        itoa(ards->addr, b, 16);
-        strcat(a, b);
-        strcat(a, ", length:");
-        itoa(ards->length, b , 16);
-        strcat(a, b);
-        strcat(a, ", type:");
-        itoa(ards->type, b , 10);
-        strcat(a, b);
-        log(a);
+        // ards = 0x7e01 + i*20;
+        // memset(a, 0, 100);
+        // strcat(a, "base:");
+        // itoa(ards->addr, b, 16);
+        // strcat(a, b);
+        // strcat(a, ", length:");
+        // itoa(ards->length, b , 16);
+        // strcat(a, b);
+        // strcat(a, ", type:");
+        // itoa(ards->type, b , 10);
+        // strcat(a, b);
+        // log(a);
     }
 }

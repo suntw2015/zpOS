@@ -18,7 +18,7 @@ boot.img : boot.bin kernel
 boot.bin : boot.asm
 	$(ASM) $< -o $@
 kernel :kernel.o main.o string.o
-	$(LD) $? -o  $@ -Ttext 0x10000 -e _start -m elf_i386  --oformat binary
+	# $(LD) $? -o  $@ -Ttext 0x10000 -e _start -m elf_i386  --oformat binary
 kernel.o : kernel.asm
 	$(ASM) $? -f elf -o $@
 main.o : main.c
@@ -26,6 +26,8 @@ main.o : main.c
 string.o : string.c
 	$(CC) -c $? -o $@ $(CC-FLAG)
 interrupt.o : interrupt.c
+	$(CC) -c $? -o $@ $(CC-FLAG)
+console.o : console.c
 	$(CC) -c $? -o $@ $(CC-FLAG)
 clean :
 	rm *.bin *.o kernel bootKernel

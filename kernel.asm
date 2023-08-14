@@ -40,16 +40,16 @@ SelectorVideo   equ LABEL_DESC_VIDEO - LABEL_GDT
 
 extern main
 entry:
-	mov ax, SelectorData
-	mov ds,ax
-	mov es,ax
-    	mov	ax, SelectorVideo
-	mov	gs, ax			; 视频段选择子(目的)
+	; mov ax, SelectorData
+	; mov ds,ax
+	; mov es,ax
+    	; mov	ax, SelectorVideo
+	; mov	gs, ax			; 视频段选择子(目的)
 
-	mov	edi, (80 * 11 + 10) * 2	; 屏幕第 11 行, 第 10 列。
-	mov	ah, 0Ch			; 0000: 黑底    1100: 红字
-	mov	al, 'P'
-	mov	[gs:edi], ax
+	; mov	edi, (80 * 11 + 10) * 2	; 屏幕第 11 行, 第 10 列。
+	; mov	ah, 0Ch			; 0000: 黑底    1100: 红字
+	; mov	al, 'P'
+	; mov	[gs:edi], ax
 
 	; 到此停止
 	call main

@@ -109,10 +109,29 @@ static inline void outb(u8 value, u16 port)
     __asm__ volatile("outb %0,%1" : : "a" (value), "dN" (port));
 }
 
+/**
+ * @brief 从某个端口读取一个字节
+ * 
+ * @param port 
+ * @return u8 
+ */
 static inline u8 inb(u16 port)
 {
 	u8 value;
 	__asm__ volatile("inb %1,%0" : "=a" (value) : "dN" (port));
+	return value;
+}
+
+/**
+ * @brief 从某个端口读取两个字节
+ * 
+ * @param port 
+ * @return u16 
+ */
+static inline u16 inw(u16 port)
+{
+    u16 value;
+	__asm__ volatile("inw %1,%0" : "=a" (value) : "dN" (port));
 	return value;
 }
 
