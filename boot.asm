@@ -96,10 +96,6 @@ Label_Start:
 ;======= 干些其他的事情
 	call Func_Boot_Entry
 
-;======= 实模式下进入内核
-cli
-jmp kernelBase:kernelOffset;
-
 ;======= 进入保护模式
 
 	cli
