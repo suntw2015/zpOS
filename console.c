@@ -18,7 +18,7 @@ void printc(char c)
     u8 foreColour = 15;
 
     //2个字节表示一个字符，0-7 ascll码值，8-11前景色，12-15背景色
-    u16 charAttr = (backColour << 4 | foreColour) | c;
+    u16 charAttr = (0x0F << 8) | c;
 
     if (c == '\n') {
         //换行
