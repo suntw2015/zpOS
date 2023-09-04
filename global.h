@@ -104,7 +104,7 @@ typedef	void (*interruptHandler) ();
  * @param value 输出的值
  * @param port 输出端口
  */
-static inline void outb(u8 value, u16 port)
+static inline void outb(u16 port, u8 value)
 {
     __asm__ volatile("outb %0,%1" : : "a" (value), "dN" (port));
 }
