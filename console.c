@@ -43,6 +43,11 @@ void printc(char c)
     } else if (c>=0x20 && c <0x7f) {
         //可打印字符
         *(video_address+cursor_x*80+cursor_y) = charAttr;
+        cursor_y++;
+        if (cursor_y == screen_width) {
+            cursor_x++;
+            cursor_y=0;
+        }
     }
 
     scroll_console();
