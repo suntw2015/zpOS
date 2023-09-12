@@ -2,7 +2,7 @@
 org	0x7c00
 bootOtherSecCount equ 2
 ;内核基础地址
-kernelBase equ 0x9000
+kernelBase equ 0x1000
 ;内核目标偏移地址
 kernelOffset equ 0x0000
 ;内核大小
@@ -92,12 +92,6 @@ Label_Start:
 	mov es, bx
 	mov bx, kernelOffset
 	int 13h
-
-	;直接进到内核
-	jmp kernelBase:kernelOffset
-
-;======= 干些其他的事情
-	call Func_Boot_Entry
 
 ;======= 进入保护模式
 
