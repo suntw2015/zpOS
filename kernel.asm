@@ -1,12 +1,9 @@
 ;内核入口(保护模式)
 global _start
 [BITS 32]
-helloKernel: db 'Start Kenel',0
 [extern main]
 
 _start:
-        jmp entry
-entry:
         ; 将字符串的字符逐个输出
         mov dx, helloKernel  ; 字符串地址
         mov bx, 0xB8000  ; 显存地址
@@ -23,3 +20,5 @@ print_loop:
 print_end:
 	call main
 	jmp $
+
+helloKernel: db 'Start Kenel',0
