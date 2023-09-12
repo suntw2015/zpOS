@@ -2,9 +2,9 @@
 org	0x7c00
 bootOtherSecCount equ 2
 ;内核基础地址
-kernelBase equ 0x1000
+kernelBase equ 0x9000
 ;内核目标偏移地址
-kernelOffset equ 0x000
+kernelOffset equ 0x0000
 ;内核大小
 kernelSecCount equ 10
 jmp Label_Start
@@ -94,7 +94,7 @@ Label_Start:
 	int 13h
 
 	;直接进到内核
-	jmp 0x10000
+	jmp kernelBase:kernelOffset
 
 ;======= 干些其他的事情
 	call Func_Boot_Entry
