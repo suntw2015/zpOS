@@ -93,6 +93,9 @@ Label_Start:
 	mov bx, kernelOffset
 	int 13h
 
+	;直接进到内核
+	jmp 0x10000
+
 ;======= 干些其他的事情
 	call Func_Boot_Entry
 
