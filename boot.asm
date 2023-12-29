@@ -1,6 +1,6 @@
 ; boot.asm
 org	0x7c00
-bootOtherSecCount equ 2
+bootOtherSecCount equ 0
 ;内核基础地址
 kernelBase equ 0x1000
 ;内核目标偏移地址
@@ -63,18 +63,6 @@ Label_Start:
 	mov bp, StartBootMessage
 	int 10h
 
-;======= 加载其他的boot功能
-	mov ah, 2
-	mov al, bootOtherSecCount
-	mov ch, 0
-	mov cl, 2
-	mov dh, 0
-	mov dl, 0
-
-	;数据存放es:bx
-	mov bx, 0x7e00
-	int 13h
-
 ;======= load kernel & jump
 ; int13h ah=02 读扇区 参数如下 https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=02h:_Read_Sectors_From_Drive  http://c.biancheng.net/view/3606.html
 ; al=扇区数 ch=柱面 cl=扇区 dh=磁头 dl=驱动器
@@ -104,66 +92,9 @@ Label_Start:
 	jmp dword SelectorCode:0x10000
 
 ;=======	display messages
-StartBootMessage:	db	"Start boot"
-DetectMemortMessage: db	"detect memory"
+StartBootMessage:	db	"booting..."
 
 ;=======	fill zero until whole sector
 
 	times	510 - ($ - $$)	db	0
 	dw	0xaa55
-
-;======= second sector, do some bois function
-MemoryLayout:
-	db 0 ;ards cout
-MemoryLayoutAddr:
-	times 256 db 0 ; ards detail
-
-Screen:
-	db 0 ;width
-	db 0 ;height
-
-Func_Boot_Entry:
-	mov ax, cs
-	mov es, ax
-	mov ax, 0x1301
-	mov bx, 0x000f
-	mov cx, 13 ;长度
-	mov dx, 0x0100 ;dh行 dl列
-	mov bp, DetectMemortMessage
-	int 10h
-
-	call Func_Detect_Memory
-	ret
-
-;======= detect memory e820 https://blog.csdn.net/weixin_42707324/article/details/108306596
-;es:di写入ards
-;
-Func_Detect_Memory:
-	mov ax, cs
-	mov es, ax
-	mov bx, 0
-	mov cx, MemoryLayoutAddr
-	mov di, cx
-
-.loop:
-	mov eax, 0xe820
-	mov ecx, 20
-	mov edx, 0x0534D4150
-	; write ards to es:di
-	int 15h
-	jc MemoryDetectFail
-	add di, 20
-	mov ax, [MemoryLayout]
-	inc ax
-	mov [MemoryLayout], ax
-	cmp ebx, 0
-	jne .loop
-	jmp MemoryDetectSuccess
-
-MemoryDetectFail:
-	mov byte [MemoryLayout], 0
-MemoryDetectSuccess:
-	ret
-
-Func_Detect_Screen:
-	
