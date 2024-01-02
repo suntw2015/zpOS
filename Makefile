@@ -17,13 +17,19 @@ bootKernel: boot.bin kernel
 boot.bin: boot.asm
 	$(ASM) $< -o $@
 
-kernel: kernel.o main.o
+kernel: kernel.o main.o string.o console.o
 	$(LD) -m elf_i386 -T $(KERNEL_LD) --oformat=binary $? -o $@
 
 kernel.o: kernel.asm
 	$(ASM) $< -f elf -o $@
 
 main.o: main.c
+	$(CC) $(CC_FLAG) -c $< -o $@
+
+string.o: string.c
+	$(CC) $(CC_FLAG) -c $< -o $@
+
+console.o: console.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 
 clean:

@@ -1,7 +1,7 @@
 #include "string.h"
 #include "global.h"
 
-int strlen(char *s)
+int strlen(const char *s)
 {
     int len=0;
     while (s[len] != '\0') {
@@ -16,8 +16,7 @@ void memset(void* s, char a, int len)
     int i=0;
     char *str = (char*)s;
     while (i<len) {
-        *(str++) = a;
-        i++;
+        str[i++] = a;
     }
 }
 
@@ -32,34 +31,71 @@ void strcat(char *s1, char* s2)
     s1[len1] = '\0';
 }
 
-void itoa(long long num,char* str,int radix)
+/**
+ * @brief 数值转成字符串
+ * 
+ * @param s 存放的字符串
+ * @param value 
+ */
+void ntos(char*s, long value, u8 radix)
 {
-    char index[]="0123456789ABCDEF";
-    unsigned unum;/*中间变量*/
-    int i=0,j,k;
-    /*确定unum的值*/
-    if(radix==10&&num<0)/*十进制负数*/
-    {
-        unum=(unsigned)-num;
-        str[i++]='-';
+    char numbers[] = "0123456789ABCDEF";
+    int t,start=0,end=0;
+    if (value<0) {
+        s[0]='-';
+        value = value*-1;
+        start=end=1;
     }
-    else unum=(unsigned)num;
-    /*转换*/
-    do{
-        str[i++]=index[unum%(unsigned)radix];
-        unum/=radix;
-       }while(unum);
-    str[i]='\0';
-    /*逆序*/
-    if(str[0]=='-')
-        k=1;/*十进制负数*/
-    else
-        k=0;
-     
-    for(j=k;j<=(i-1)/2;j++)
-    {       char temp;
-        temp=str[j];
-        str[j]=str[i-1+k-j];
-        str[i-1+k-j]=temp;
+    while(value) {
+        t=value%radix;
+        s[end++]=numbers[t];
+        value/=radix;
     }
+
+    char c;
+    for(end--;start<end;start++,end--) {
+        c = s[start];
+        s[start] = s[end];
+        s[end] = c;
+    }
+}
+
+int strcmp(const char *s1, const char *s2) 
+{
+    int len1 = strlen(s1);
+    int len2 = strlen(s2);
+
+    return strncmp(s1, s2, len1>len2 ? len1 : len2);
+}
+
+int strncmp(const char *s1, const char *s2, int count)
+{
+    for (int i=0;i<count;i++) {
+        if (s1[i] != s2[i]) {
+            return s1[i] - s2[i];
+        }
+    }
+    return 0;
+}
+
+int strpos(const char *target, const char*searh)
+{
+    int lenTarget = strlen(target);
+    int lenSearch = strlen(searh);
+    if (lenTarget<lenSearch) {
+        return -1;
+    }
+
+    for(int i=0,j=0;i<lenTarget;i++) {
+        if (target[i] != searh[j]) {
+            j=0;
+            continue;
+        }
+        j++;
+        if (j==lenSearch) {
+            return i-j+1;
+        }
+    }
+
+    return -1;
 }

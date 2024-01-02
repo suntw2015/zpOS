@@ -76,6 +76,14 @@ void prints(char *s)
     }
 }
 
+void printsl(char *s)
+{
+    for (int i=0;s[i]!='\0';i++) {
+        printc(s[i]);
+    }
+    printc('\n');
+}
+
 void clear_console()
 {
     cursor_x = 0;

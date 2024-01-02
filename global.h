@@ -138,9 +138,9 @@ static inline u16 inw(u16 port)
 static inline void reload_gdt(gdt_descriptor_t* descriptor)
 {
 	__asm__ volatile (
-        "lgdt %0\n"
+        "lgdt (%0)"
         :
-        : "m"(descriptor)
+        : "r"(descriptor)
     );
 }
 

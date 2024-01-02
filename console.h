@@ -4,6 +4,8 @@ void printc(char c);
 
 void prints(char *s);
 
+void printsl(char *s);
+
 void clear_console();
 
 void move_cursor();
