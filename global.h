@@ -1,8 +1,12 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define GDT_COUNT 4
-#define IDT_COUNT 255
+#define MASTER_8295A_PORT1 0x20
+#define MASTER_8295A_PORT2 0x21
+#define SLAVE_8295A_PORT1 0xA0
+#define SLAVE_8295A_PORT2 0xA1
+
+#define GDT_TABLE_COUNT 3
 
 /* 中断向量 */
 #define	INT_INDEX_DIVIDE		0x0 //非法除数
@@ -20,7 +24,10 @@
 #define	INT_INDEX_STACK_FAULT		0xC
 #define	INT_INDEX_PROTECTION		0xD
 #define	INT_INDEX_PAGE_FAULT		0xE
+#define INT_INDEX_UNKNOW_EXCEPTION  0xF
 #define	INT_INDEX_COPROC_ERR		0x10
+#define INT_INDEX_ALIGNMENT_CHECK_EXCEPTION 0x11
+#define INT_INDEX_MACHINE_CHECK_EXCEPTION 0x12
 
 //调用门
 #define GATE_TYPE_CALL 0x8C
@@ -46,23 +53,6 @@ typedef __signed__ int s32;
 typedef unsigned int u32;
 typedef __signed__ long long s64;
 typedef unsigned long long u64;
-
-typedef struct __packed
-{
-	u64 addr;
-	u64 length;
-	u32 type;
-} MemoryArds;
-
-typedef struct KernelConfig
-{
-	int screenMaxRow;	//屏幕最大行
-	int screenMaxCol;	//屏幕最大列
-    int cursorCurrentRow; //光标目前行
-    int cursorCurrentCol; //光标目前列
-} KernelConfig;
-
-extern KernelConfig kernelConfig;
 
 //IDT结构
 typedef struct {
@@ -147,7 +137,7 @@ static inline void reload_gdt(gdt_descriptor_t* descriptor)
 static inline void reload_idt(idt_descriptor_t* descriptor)
 {
 	__asm__ volatile (
-        "lidt (%0)\n"
+        "lidt (%0)"
         :
         : "r"(descriptor)
     );

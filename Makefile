@@ -2,7 +2,7 @@ BOOT_SEC_COUNT=1
 LD=ld
 ASM=nasm
 CC=gcc
-CC_FLAG=-std=c99 -m32
+CC_FLAG=-std=c99 -m32 -fno-builtin
 KERNEL_LD=kernel.ld
 
 # copyImg: bootKernel
@@ -12,12 +12,12 @@ KERNEL_LD=kernel.ld
 bootKernel: boot.bin kernel
 	touch bootKernel
 	dd if=boot.bin of=bootKernel bs=512 count=$(BOOT_SEC_COUNT) conv=notrunc
-	dd if=kernel of=bootKernel bs=512 count=10 seek=$(BOOT_SEC_COUNT) conv=notrunc
+	dd if=kernel of=bootKernel bs=512 count=30 seek=$(BOOT_SEC_COUNT) conv=notrunc
 
 boot.bin: boot.asm
 	$(ASM) $< -o $@
 
-kernel: kernel.o main.o string.o console.o
+kernel: kernel.o main.o string.o console.o interrupt.o
 	$(LD) -m elf_i386 -T $(KERNEL_LD) --oformat=binary $? -o $@
 
 kernel.o: kernel.asm
@@ -32,5 +32,7 @@ string.o: string.c
 console.o: console.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 
+interrupt.o: interrupt.c
+	$(CC) $(CC_FLAG) -c $< -o $@
 clean:
 	rm -f *.bin *.o kernel bootKernel

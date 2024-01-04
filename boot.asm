@@ -6,7 +6,7 @@ kernelBase equ 0x1000
 ;内核目标偏移地址
 kernelOffset equ 0x0000
 ;内核大小
-kernelSecCount equ 10
+kernelSecCount equ 30
 jmp Label_Start
 
 ;GDT define

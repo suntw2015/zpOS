@@ -39,6 +39,10 @@ void strcat(char *s1, char* s2)
  */
 void ntos(char*s, long value, u8 radix)
 {
+    if (value==0) {
+        s[0] = '0';
+        return;
+    }
     char numbers[] = "0123456789ABCDEF";
     int t,start=0,end=0;
     if (value<0) {

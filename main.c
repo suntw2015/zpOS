@@ -1,14 +1,15 @@
 #include "global.h"
 #include "string.h"
 #include "console.h"
+#include "interrupt.h"
 
 void init_gdt();
-void init_gdtTable();
-void initGdtTableEntry(gdt_table_entry* entry, u32 baseAddress, u16 limit, u8 access, u8 granularity);
+void init_gdt_table();
+void init_gdt_table_entry(gdt_table_entry* entry, u32 baseAddress, u16 limit, u8 access, u8 granularity);
 void print_gdt();
 
 //gdt存储结构
-gdt_table_entry gdtTable[3];
+gdt_table_entry gdt_table[GDT_TABLE_COUNT];
 gdt_descriptor_t gdt;
 
 int main() {
@@ -19,26 +20,23 @@ int main() {
     ntos(a, 255, 16);
     printsl(a);
 
+    //-------------gdt-----------------
     printsl("start reload gdt");
     init_gdt();
 
-    prints("base:");
-    memset(a, 0, 100);
-    ntos(a, gdt.base, 16);
-    prints(a);
-    prints(" ");
-    prints("limit:");
-    memset(a, 0, 100);
-    ntos(a, gdt.limit, 10);
-    printsl(a);
-
-    prints(" ");
-    memset(a, 0, 100);
-    ntos(a, sizeof(gdt_table_entry), 10);
-    printsl(a);
-
     printsl("reload gdt finish");
     print_gdt();
+
+    //----------idt-------------
+    printsl("start init idt");
+    init_idt();
+    printsl("init idt finish");
+
+    // 触发中断，测试中断处理函数
+    __asm__ volatile ("int $0x00"); // 触发 Divide Error 异常
+    __asm__ volatile ("int $0x01"); // 触发 Debug Exception
+    __asm__ volatile ("int $0x10"); // 触发 Debug Exception
+    printsl("test idt finish");
 
     while (1) {
     };
@@ -47,20 +45,20 @@ int main() {
 }
 
 void init_gdt() {
-    init_gdtTable();
-    gdt.base = &gdtTable[0];
+    init_gdt_table();
+    gdt.base = (u32)gdt_table;
     gdt.limit = (sizeof(gdt_table_entry)*3)-1;
     reload_gdt(&gdt);
 }
-void init_gdtTable() {
+void init_gdt_table() {
     //empty
-    initGdtTableEntry(&gdtTable[0], 0x00000000, 0x0000, 0x00, 0x00);
+    init_gdt_table_entry(&gdt_table[0], 0x00000000, 0x0000, 0x00, 0x00);
     //code
-    initGdtTableEntry(&gdtTable[1], 0x00000000, 0xffff, 0b10011010, 0b11001111);
+    init_gdt_table_entry(&gdt_table[1], 0x00000000, 0xffff, 0b10011010, 0b11001111);
     //data
-    initGdtTableEntry(&gdtTable[2], 0x00000000, 0xffff, 0b10010010, 0b11001111);
+    init_gdt_table_entry(&gdt_table[2], 0x00000000, 0xffff, 0b10010010, 0b11001111);
 }
-void initGdtTableEntry(gdt_table_entry* entry, u32 baseAddress, u16 limit, u8 access, u8 granularity) {
+void init_gdt_table_entry(gdt_table_entry* entry, u32 baseAddress, u16 limit, u8 access, u8 granularity) {
     entry->base_low = baseAddress & 0xffff;
     entry->base_mid = baseAddress>>16 & 0xff;
     entry->base_high = baseAddress>>24 & 0xff;
@@ -87,7 +85,7 @@ void print_gdt() {
 
         prints("base address: 0x");
         memset(msg,0,100);
-        ntos(msg, gdtTable[i].base_high<<16 | gdtTable[i].base_mid<<8 | gdtTable[i].base_low, 16);
+        ntos(msg, gdt_table[i].base_high<<16 | gdt_table[i].base_mid<<8 | gdt_table[i].base_low, 16);
         printsl(msg);
     }
 }
