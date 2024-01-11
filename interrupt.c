@@ -6,8 +6,6 @@
 idt_table_entry idt_table[IDT_TABLE_COUNT];
 idt_descriptor_t idt;
 
-
-
 extern void isr0 ();
 extern void isr1 ();
 extern void isr2 ();

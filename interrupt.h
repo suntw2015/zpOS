@@ -1,3 +1,8 @@
+/***
+ * 参考内容
+ * http://www.osdever.net/bkerndev/Docs/irqs.htm
+ * http://www.jamesmolloy.co.uk/tutorial_html/5.-IRQs%20and%20the%20PIT.html
+*/
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 
