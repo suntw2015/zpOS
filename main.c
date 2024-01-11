@@ -2,6 +2,7 @@
 #include "string.h"
 #include "console.h"
 #include "interrupt.h"
+#include "time.h"
 
 void init_gdt();
 void init_gdt_table();
@@ -30,13 +31,17 @@ int main() {
     //----------idt-------------
     printsl("start init idt");
     init_idt();
+    init_time(50);
+    //一定要开始中断，进入保护模式前，cli禁用了所有的中断
+    sti();
     printsl("init idt finish");
 
     // 触发中断，测试中断处理函数
     __asm__ volatile ("int $0x00"); // 触发 Divide Error 异常
     __asm__ volatile ("int $0x01"); // 触发 Debug Exception
     __asm__ volatile ("int $0x10"); // 触发 Debug Exception
-    printsl("test idt finish");
+    // __asm__ volatile ("int $0x20"); // 触发 Debug Exception
+    // __asm__ volatile ("int $0x20"); // 触发 Debug Exception
 
     while (1) {
     };

@@ -6,6 +6,8 @@
 idt_table_entry idt_table[IDT_TABLE_COUNT];
 idt_descriptor_t idt;
 
+
+
 extern void isr0 ();
 extern void isr1 ();
 extern void isr2 ();
@@ -26,6 +28,23 @@ extern void isr16 ();
 extern void isr17 ();
 extern void isr18 ();
 
+extern void isr32 ();
+extern void isr33 ();
+extern void isr34 ();
+extern void isr35 ();
+extern void isr36 ();
+extern void isr37 ();
+extern void isr38 ();
+extern void isr39 ();
+extern void isr40 ();
+extern void isr41 ();
+extern void isr42 ();
+extern void isr43 ();
+extern void isr44 ();
+extern void isr45 ();
+extern void isr46 ();
+extern void isr47 ();
+
 //主片对饮端口为20h,21h,从片对应a0h,a1h
 //初始化过程
 //1.往20h/a0h写入icw1
@@ -35,20 +54,20 @@ extern void isr18 ();
 
 void init_8259A() {
     ////icw1
-	outb(MASTER_8295A_PORT1,	0x11);
-	outb(SLAVE_8295A_PORT1,	0x11);
+	outb(MASTER_COMMAND,0x11);
+	outb(SLAVE_COMMAND,	0x11);
     //icw2
-	outb(MASTER_8295A_PORT2,	0x20);
-	outb(SLAVE_8295A_PORT2,	0x28);
+	outb(MASTER_DATA,	0x20);
+	outb(SLAVE_DATA,	0x28);
     //icw3
-	outb(MASTER_8295A_PORT2,	0x4);
-	outb(SLAVE_8295A_PORT2,	0x2);
+	outb(MASTER_DATA,	0x04);
+	outb(SLAVE_DATA,	0x02);
     //icw4
-	outb(MASTER_8295A_PORT2,	0x1);
-	outb(SLAVE_8295A_PORT2,	0x1);
+	outb(MASTER_DATA,	0x01);
+	outb(SLAVE_DATA,	0x01);
     //ocw
-	outb(MASTER_8295A_PORT2,	0xFF);
-	outb(SLAVE_8295A_PORT2,	0xFF);
+	outb(MASTER_DATA,	0x00);
+	outb(SLAVE_DATA,	0x00);
 }
 
 void init_idt()
@@ -56,6 +75,7 @@ void init_idt()
     init_idt_table();
     idt.base = (u32)idt_table;
     idt.limit = sizeof(idt_table_entry)*IDT_TABLE_COUNT-1;
+    memset(customer_interrupt_handle_table, 0, sizeof(customer_interrupt_handle)*IDT_TABLE_COUNT);
     reload_idt(&idt);
 }
 
@@ -88,6 +108,18 @@ void exception_handler (interrupt_info info) {
     ntos(a, info.err_code, 16);
     prints(a);
     printc('\n');
+
+    if (info.int_no >= 40) {
+        //8-16是在从片上
+        // Send reset signal to slave.
+       outb(SLAVE_COMMAND, 0x20);
+    }
+    outb(MASTER_COMMAND, 0x20);
+    //自定义处理方法
+    if (customer_interrupt_handle_table[info.int_no]) {
+        customer_interrupt_handle handle = customer_interrupt_handle_table[info.int_no];
+        handle(info);
+    }
 }
 
 void init_idt_table() {
@@ -111,4 +143,26 @@ void init_idt_table() {
     init_idt_table_entry(INT_INDEX_COPROC_ERR, GATE_TYPE_INTERRUPT, isr16, PRIVILEGE_KRNL);
     init_idt_table_entry(INT_INDEX_ALIGNMENT_CHECK_EXCEPTION, GATE_TYPE_INTERRUPT, isr17, PRIVILEGE_KRNL);
     init_idt_table_entry(INT_INDEX_MACHINE_CHECK_EXCEPTION, GATE_TYPE_INTERRUPT, isr18, PRIVILEGE_KRNL);
+    //自定义
+    init_idt_table_entry(INT_INDEX_CUSTOMER32, GATE_TYPE_INTERRUPT, isr32, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER33, GATE_TYPE_INTERRUPT, isr33, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER34, GATE_TYPE_INTERRUPT, isr34, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER35, GATE_TYPE_INTERRUPT, isr35, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER36, GATE_TYPE_INTERRUPT, isr36, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER37, GATE_TYPE_INTERRUPT, isr37, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER38, GATE_TYPE_INTERRUPT, isr38, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER39, GATE_TYPE_INTERRUPT, isr39, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER40, GATE_TYPE_INTERRUPT, isr40, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER41, GATE_TYPE_INTERRUPT, isr41, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER42, GATE_TYPE_INTERRUPT, isr42, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER43, GATE_TYPE_INTERRUPT, isr43, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER44, GATE_TYPE_INTERRUPT, isr44, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER45, GATE_TYPE_INTERRUPT, isr45, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER46, GATE_TYPE_INTERRUPT, isr46, PRIVILEGE_KRNL);
+    init_idt_table_entry(INT_INDEX_CUSTOMER47, GATE_TYPE_INTERRUPT, isr47, PRIVILEGE_KRNL);
+}
+
+void register_customer_interrupt_handle(u8 index, customer_interrupt_handle handle)
+{
+    customer_interrupt_handle_table[index] = handle;
 }

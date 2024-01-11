@@ -1,33 +1,12 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
-#define MASTER_8295A_PORT1 0x20
-#define MASTER_8295A_PORT2 0x21
-#define SLAVE_8295A_PORT1 0xA0
-#define SLAVE_8295A_PORT2 0xA1
+#define MASTER_COMMAND 0x20
+#define MASTER_DATA 0x21
+#define SLAVE_COMMAND 0xA0
+#define SLAVE_DATA 0xA1
 
 #define GDT_TABLE_COUNT 3
-
-/* 中断向量 */
-#define	INT_INDEX_DIVIDE		0x0 //非法除数
-#define	INT_INDEX_DEBUG		0x1 //
-#define	INT_INDEX_NMI			0x2
-#define	INT_INDEX_BREAKPOINT		0x3
-#define	INT_INDEX_OVERFLOW		0x4
-#define	INT_INDEX_BOUNDS		0x5
-#define	INT_INDEX_INVAL_OP		0x6
-#define	INT_INDEX_COPROC_NOT		0x7
-#define	INT_INDEX_DOUBLE_FAULT		0x8
-#define	INT_INDEX_COPROC_SEG		0x9
-#define	INT_INDEX_INVAL_TSS		0xA
-#define	INT_INDEX_SEG_NOT		0xB
-#define	INT_INDEX_STACK_FAULT		0xC
-#define	INT_INDEX_PROTECTION		0xD
-#define	INT_INDEX_PAGE_FAULT		0xE
-#define INT_INDEX_UNKNOW_EXCEPTION  0xF
-#define	INT_INDEX_COPROC_ERR		0x10
-#define INT_INDEX_ALIGNMENT_CHECK_EXCEPTION 0x11
-#define INT_INDEX_MACHINE_CHECK_EXCEPTION 0x12
 
 //调用门
 #define GATE_TYPE_CALL 0x8C
@@ -91,8 +70,8 @@ typedef	void (*interruptHandler) ();
 /**
  * @brief 向某个端口输出一个字节
  * 
- * @param value 输出的值
  * @param port 输出端口
+ * @param value 输出的值
  */
 static inline void outb(u16 port, u8 value)
 {
@@ -148,6 +127,11 @@ static inline void iret()
 	__asm__ volatile(
 		"iret"
 	);
+}
+
+static inline void sti()
+{
+    __asm__ volatile ("sti");
 }
 
 #endif
