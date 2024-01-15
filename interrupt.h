@@ -5,6 +5,7 @@
 */
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
+#include "global.h"
 
 #define MASTER_COMMAND 0x20
 #define MASTER_DATA 0x21

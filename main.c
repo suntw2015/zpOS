@@ -3,11 +3,13 @@
 #include "console.h"
 #include "interrupt.h"
 #include "time.h"
+#include "keyboard.h"
 
 void init_gdt();
 void init_gdt_table();
 void init_gdt_table_entry(gdt_table_entry* entry, u32 baseAddress, u16 limit, u8 access, u8 granularity);
 void print_gdt();
+void init_keyborad();
 
 //gdt存储结构
 gdt_table_entry gdt_table[GDT_TABLE_COUNT];
@@ -37,11 +39,14 @@ int main() {
     printsl("init idt finish");
 
     // 触发中断，测试中断处理函数
-    __asm__ volatile ("int $0x00"); // 触发 Divide Error 异常
-    __asm__ volatile ("int $0x01"); // 触发 Debug Exception
-    __asm__ volatile ("int $0x10"); // 触发 Debug Exception
+    // __asm__ volatile ("int $0x00"); // 触发 Divide Error 异常
+    // __asm__ volatile ("int $0x01"); // 触发 Debug Exception
+    // __asm__ volatile ("int $0x10"); // 触发 Debug Exception
     // __asm__ volatile ("int $0x20"); // 触发 Debug Exception
     // __asm__ volatile ("int $0x20"); // 触发 Debug Exception
+
+    //-----------键盘-------------
+    init_keyborad();
 
     while (1) {
     };
@@ -93,4 +98,8 @@ void print_gdt() {
         ntos(msg, gdt_table[i].base_high<<16 | gdt_table[i].base_mid<<8 | gdt_table[i].base_low, 16);
         printsl(msg);
     }
+}
+
+void init_keyborad() {
+    register_customer_interrupt_handle(INT_INDEX_CUSTOMER33, keybord_interrupt_handle);
 }

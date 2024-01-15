@@ -8,11 +8,11 @@ u32 tick = 0;
 void timer_callback(interrupt_info info)
 {
     tick++;
-    prints("tick: ");
-    char a[50];
-    memset(a, 0, 50);
-    ntos(a, tick, 10);
-    printsl(a);
+    // prints("tick: ");
+    // char a[50];
+    // memset(a, 0, 50);
+    // ntos(a, tick, 10);
+    // printsl(a);
 }
 
 void init_time(u32 frequency)
