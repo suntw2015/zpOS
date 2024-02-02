@@ -4,6 +4,7 @@
 #include "interrupt.h"
 #include "time.h"
 #include "keyboard.h"
+#include "page.h"
 
 void init_gdt();
 void init_gdt_table();
@@ -18,25 +19,12 @@ gdt_descriptor_t gdt;
 int main() {
     clear_console();
     printsl("welcome to c language");
-    char a[100];
-    memset(a, 0, 100);
-    ntos(a, 255, 16);
-    printsl(a);
 
-    //-------------gdt-----------------
-    printsl("start reload gdt");
     init_gdt();
-
-    printsl("reload gdt finish");
-    print_gdt();
-
-    //----------idt-------------
-    printsl("start init idt");
     init_idt();
     init_time(50);
-    //一定要开始中断，进入保护模式前，cli禁用了所有的中断
+    // //一定要开始中断，进入保护模式前，cli禁用了所有的中断
     sti();
-    printsl("init idt finish");
 
     // 触发中断，测试中断处理函数
     // __asm__ volatile ("int $0x00"); // 触发 Divide Error 异常
@@ -47,6 +35,13 @@ int main() {
 
     //-----------键盘-------------
     init_keyborad();
+
+    //-----------分页-----------
+    printsl("init page");
+    init_page();
+    u32 *ptr = (u32*)0x10000000;
+    u32 do_page_fault = *ptr;
+    printsl("init page finish");
 
     while (1) {
     };

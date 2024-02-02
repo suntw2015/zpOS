@@ -95,17 +95,19 @@ void init_idt_table_entry(u8 index, u8 type, interruptHandler handler, u8 privil
 }
 
 void exception_handler (interrupt_info info) {
-    // printsl("----exception handle----");
-    // prints("no:0x");
-    // char a[100];
-    // memset(a,0,100);
-    // ntos(a, info.int_no, 16);
-    // prints(a);
-    // prints(" code:0x");
-    // memset(a,0,100);
-    // ntos(a, info.err_code, 16);
-    // prints(a);
-    // printc('\n');
+    if (info.int_no != INT_INDEX_CUSTOMER32) {
+        printsl("----exception handle----");
+        prints("no:0x");
+        char a[100];
+        memset(a,0,100);
+        ntos(a, info.int_no, 16);
+        prints(a);
+        prints(" code:0x");
+        memset(a,0,100);
+        ntos(a, info.err_code, 16);
+        prints(a);
+        printc('\n');
+    }
 
     if (info.int_no >= 40) {
         //8-16是在从片上
