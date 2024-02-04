@@ -59,6 +59,7 @@ static char scan_codes[] =
     0,	/* All other keys are undefined */
 };
 
+void init_keyborad();
 void keybord_interrupt_handle(interrupt_info info);
 
 #endif

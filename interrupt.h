@@ -60,6 +60,21 @@ typedef struct {
     u32 eip, cs, eflags, useresp, ss; //中断发生后，cpu自动处理的
 }__attribute__((packed)) interrupt_info;
 
+//IDT结构
+typedef struct {
+    u16 offset_low;    // 中断处理函数地址低16位
+    u16 selector;      // 中断处理函数代码段选择子
+    u8 zero;           // 保留位，必须为0
+    u8 type_attr;      // 中断描述符属性
+    u16 offset_high;   // 中断处理函数地址高16位
+} __attribute__((packed)) idt_table_entry;
+
+//IDT描述符结构
+typedef struct {
+    u16 limit;
+    u32 base;
+} __attribute__((packed)) idt_descriptor_t;
+
 //自定义中断处理
 typedef void (*customer_interrupt_handle)(interrupt_info);
 customer_interrupt_handle customer_interrupt_handle_table[IDT_TABLE_COUNT];

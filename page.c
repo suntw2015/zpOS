@@ -122,3 +122,37 @@ void print_page(page_directory_entry *dir)
         }
     }
 }
+
+page_directory_entry* clone_page_dir(page_directory_entry* src) {
+    page_directory_entry* dir = (page_directory_entry*)malloc(sizeof(page_directory_entry)*PAGE_DIRECTORY_TABLE_SIZE, 1);
+    if (kernel_page_dir == -1) {
+        printsl("clone page fail, no valid memory for kernel page");
+        return;
+    }
+
+    memset(dir, 0, sizeof(page_directory_entry)*PAGE_DIRECTORY_TABLE_SIZE);
+
+    page_table_entry* table;
+    page_directory_entry* tmp = dir;
+
+    for (int i=0;i<PAGE_SIZE;i++) {
+        if (src->address == 0) {
+            continue;
+        }
+
+        //内核区域不用拷贝，公用的
+        if ((kernel_page_dir+i)->address == src->address) {
+            memcpy(src+i, dir+i, sizeof(page_table_entry));
+        } else {
+            table = (page_table_entry*)malloc(sizeof(page_table_entry), 1);
+            memset(table, 0, sizeof(page_table_entry));
+            dir->address = (u32)table >> 12;
+            dir->accessed = 0;
+            dir->present = 1;
+            dir->rw = 1;
+        }
+        src++;
+    }
+
+    return dir;
+}

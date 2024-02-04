@@ -17,7 +17,7 @@ bootKernel: boot.bin kernel
 boot.bin: boot.asm
 	$(ASM) $< -o $@
 
-kernel: kernel.o main.o string.o console.o interrupt.o time.o keyboard.o page.o heap.o
+kernel: kernel.o main.o string.o console.o interrupt.o time.o keyboard.o page.o heap.o gdt.o
 	$(LD) -m elf_i386 -T $(KERNEL_LD) --oformat=binary $? -o $@
 
 kernel.o: kernel.asm
@@ -41,6 +41,8 @@ keyboard.o: keyboard.c
 page.o: page.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 heap.o: heap.c
+	$(CC) $(CC_FLAG) -c $< -o $@
+gdt.o: gdt.c
 	$(CC) $(CC_FLAG) -c $< -o $@
 clean:
 	rm -f *.bin *.o kernel bootKernel

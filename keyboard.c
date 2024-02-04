@@ -19,3 +19,7 @@ void keybord_interrupt_handle(interrupt_info info)
         printc(scan_codes[scan_code]);
     }
 }
+
+void init_keyborad() {
+    register_customer_interrupt_handle(INT_INDEX_CUSTOMER33, keybord_interrupt_handle);
+}

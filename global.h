@@ -33,38 +33,6 @@ typedef unsigned int u32;
 typedef __signed__ long long s64;
 typedef unsigned long long u64;
 
-//IDT结构
-typedef struct {
-    u16 offset_low;    // 中断处理函数地址低16位
-    u16 selector;      // 中断处理函数代码段选择子
-    u8 zero;           // 保留位，必须为0
-    u8 type_attr;      // 中断描述符属性
-    u16 offset_high;   // 中断处理函数地址高16位
-} __attribute__((packed)) idt_table_entry;
-
-//IDT描述符结构
-typedef struct {
-    u16 limit;
-    u32 base;
-} __attribute__((packed)) idt_descriptor_t;
-
-//GDT描述符结构
-typedef struct {
-    u16 limit;
-    u32 base;
-} __attribute__((packed)) gdt_descriptor_t;
-
-//GDT结构
-typedef struct
-{
-	u16 limit_low;     // GDT表界限低16位
-    u16 base_low;      // GDT表基地址低16位
-    u8 base_mid;       // GDT表基地址中间8位
-    u8 access;         // GDT描述符访问标志
-    u8 granularity;    // GDT描述符粒度标志
-    u8 base_high;      // GDT表基地址高8位
-}__attribute__((packed)) gdt_table_entry;
-
 typedef	void (*interruptHandler) ();
 
 /**
@@ -104,7 +72,7 @@ static inline u16 inw(u16 port)
 	return value;
 }
 
-static inline void reload_gdt(gdt_descriptor_t* descriptor)
+static inline void reload_gdt(u32 descriptor)
 {
 	__asm__ volatile (
         "lgdt (%0)"
@@ -113,7 +81,7 @@ static inline void reload_gdt(gdt_descriptor_t* descriptor)
     );
 }
 
-static inline void reload_idt(idt_descriptor_t* descriptor)
+static inline void reload_idt(u32 descriptor)
 {
 	__asm__ volatile (
         "lidt (%0)"

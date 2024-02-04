@@ -74,7 +74,7 @@ void init_idt()
     idt.base = (u32)idt_table;
     idt.limit = sizeof(idt_table_entry)*IDT_TABLE_COUNT-1;
     memset(customer_interrupt_handle_table, 0, sizeof(customer_interrupt_handle)*IDT_TABLE_COUNT);
-    reload_idt(&idt);
+    reload_idt((u32)&idt);
 }
 
 /**
