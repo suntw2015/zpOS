@@ -5,6 +5,7 @@
 #include "time.h"
 #include "keyboard.h"
 #include "page.h"
+#include "heap.h"
 
 void init_gdt();
 void init_gdt_table();
@@ -35,13 +36,11 @@ int main() {
 
     //-----------键盘-------------
     init_keyborad();
-
+    init_heap();
+    
     //-----------分页-----------
     printsl("init page");
     init_page();
-    u32 *ptr = (u32*)0x10000000;
-    u32 do_page_fault = *ptr;
-    printsl("init page finish");
 
     while (1) {
     };

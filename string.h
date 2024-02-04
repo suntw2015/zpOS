@@ -16,4 +16,6 @@ int strpos(const char *target, const char*searh);
  */
 void ntos(char*s, long value, u8 radix);
 
+void memcpy(const void* src, void* dst, u32 size);
+
 #endif

@@ -3,48 +3,53 @@
 #include "string.h"
 #include "console.h"
 #include "interrupt.h"
+#include "heap.h"
 
-//物理内存页数
-u32 physics_page_count;
-//物理内存使用情况
-u32* physics_page_map;
-
-//一定要4kb对齐
-static __attribute__((aligned(4096))) page_directory_entry page_dir[PAGE_DIRECTORY_TABLE_SIZE];
-static __attribute__((aligned(4096))) page_table_entry page_table[PAGE_DIRECTORY_TABLE_SIZE];
-
-static u32* current_page_dir;
+static page_directory_entry *kernel_page_dir, *current_page_dir;
 
 void init_page()
 {
-    int i;
-    //如果从地址不是0开始映射，那么在cr0开启分页之后，下一行执行的代码地址，会发生映射变化，需要注意
-    int address = 0;
-    for (i=0;i<PAGE_DIRECTORY_TABLE_SIZE;i++) {
-        page_table[i].address = address>>12;
-        page_table[i].present = 1;
-        page_table[i].rw = 1;
-        page_table[i].user = 1;
-        address+= 0x1000;
+    current_page_dir = kernel_page_dir = (page_directory_entry*)malloc(sizeof(page_directory_entry)*PAGE_DIRECTORY_TABLE_SIZE, 1);
+    if (kernel_page_dir == -1) {
+        printsl("init page fail, no valid memory for kernel page");
+        return;
     }
 
-    page_dir[0].address = (u32)&page_table[0] >> 12;
-    page_dir[0].present = 1;
-    page_dir[0].rw = 1;
-    page_dir[0].accessed = 1;
+    page_table_entry *table = (page_table_entry*)malloc(sizeof(page_table_entry)*PAGE_SIZE, 1);
+    if (table == -1) {
+        printsl("init page fail, no valid memory for kernel page");
+        return;
+    }
+
+    kernel_page_dir->address = (u32)table >> 12;
+    kernel_page_dir->present = 1;
+    kernel_page_dir->rw = 1;
+    kernel_page_dir->accessed = 1;
+
+    //如果从地址不是0开始映射，那么在cr0开启分页之后，下一行执行的代码地址，会发生映射变化，需要注意
+    int i;
+    int address = 0;
+    for (i=0;i<PAGE_SIZE;i++, table++) {
+        table->address = address>>12;
+        table->present = 1;
+        table->rw = 1;
+        table->user = 1;
+        address+= 0x1000;
+    }
     
-    for (i = 1; i < PAGE_DIRECTORY_TABLE_SIZE; i++)
+    page_directory_entry*dir = kernel_page_dir;
+    for (dir++, i = 1; i < PAGE_DIRECTORY_TABLE_SIZE; i++, dir++)
     {
-        page_dir[i].address = 0;
-        page_dir[i].present = 0;
-        page_dir[i].rw = 1;
+        dir->address = 0;
+        dir->present = 0;
+        dir->rw = 1;
     }
 
     //注册异常处理
     register_customer_interrupt_handle(INT_INDEX_PAGE_FAULT, page_interrupt_handle);
 
-    print_page();
-    reload_page_directory(&page_dir[0]);
+    print_page(kernel_page_dir);
+    reload_page_directory(kernel_page_dir);
 }
 
 /**
@@ -93,43 +98,26 @@ void reload_page_directory(page_directory_entry* dir)
     __asm__ volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
-void print_page()
+void print_page(page_directory_entry *dir)
 {
     int i,j,t;
     char a[100];
-    for (i=0;i<PAGE_DIRECTORY_TABLE_SIZE;i++) {
-        if (page_dir[i].address == 0) {
+    for (i=0;i<PAGE_DIRECTORY_TABLE_SIZE;i++,dir++) {
+        if (dir->address == 0) {
             break;
         }
-        memset(a,0,100);
-        prints("dir ");
-        ntos(a, i, 10);
-        prints(a);
-        prints(" address: 0x");
-        memset(a,0,100);
-        ntos(a, &page_dir[i], 16);
-        printsl(a);
 
-        page_table_entry* table = (page_table_entry*)(page_dir[i].address << 12);
+        print_number("dir %d", i);
+        print_number(" address %x\n", dir);
 
+        page_table_entry* table = (page_table_entry*)(dir->address << 12);
         for (j=0;j<PAGE_DIRECTORY_TABLE_SIZE;j++) {
             if (j == 10) {
                 break;
             }
-            memset(a,0,100);
-            prints("    table ");
-            ntos(a, j, 10);
-            prints(a);
-
-            prints(" address: 0x");
-            memset(a,0,100);
-            ntos(a, (u32)table, 16);
-            prints(a);
-
-            prints(" frame address : 0x");
-            memset(a,0,100);
-            ntos(a, table->address << 12, 16);
-            printsl(a);
+            print_number("    table %d", j);
+            print_number(" address %x", table);
+            print_number(" frame address %x\n", table->address << 12);
             table++;
         }
     }

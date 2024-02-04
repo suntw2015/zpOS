@@ -1,5 +1,6 @@
 #include "console.h"
 #include "global.h"
+#include "string.h"
 
 u16 *video_address = (u16*)0xB8000;
 u8 cursor_x = 0;
@@ -131,5 +132,34 @@ void scroll_console()
         }
         // The cursor should now be on the last line.
         cursor_y = screen_height-1;
+    }
+}
+
+/**
+ * 输出带有转义的字符串
+ * %d 10进制整数
+ * %x 16进制整数
+*/
+void print_number(char *s, u32 number) {
+    char a[20] = {0};
+    for (int i=0;s[i]!='\0';i++) {
+        if (s[i] == '%') {
+            if (s[i+1] == 'd') {
+                ntos(a, number, 10);
+                prints(a);
+                i++;
+                continue;
+            } else if (s[i+1] == 'x') {
+                prints("0x:");
+                ntos(a, number, 16);
+                prints(a);
+                i++;
+                continue;
+            } else {
+                printc(s[i]);    
+            }
+        } else {
+            printc(s[i]);
+        }
     }
 }

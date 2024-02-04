@@ -103,3 +103,11 @@ int strpos(const char *target, const char*searh)
 
     return -1;
 }
+
+void memcpy(const void* src, void* dst, u32 size) {
+    for (u32 i=0;i<size;i++) {
+        *(char*)dst = *(char*)src;
+        dst++;
+        src++;
+    }
+}

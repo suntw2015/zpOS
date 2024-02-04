@@ -4,28 +4,12 @@
 #include "interrupt.h"
 
 #define PAGE_DIRECTORY_TABLE_SIZE 1024
-#define PAGE_SIZE 4096
-//页表属性位
-#define PAGE_TABLE_ATTR_P 0
-#define PAGE_TABLE_ATTR_RW 1
-#define PAGE_TABLE_ATTR_US 2
-#define PAGE_TABLE_ATTR_PWT 3
-#define PAGE_TABLE_ATTR_PCD 4
-#define PAGE_TABLE_ATTR_A 5
-#define PAGE_TABLE_ATTR_D 6
-#define PAGE_TABLE_ATTR_PAT 7
-#define PAGE_TABLE_ATTR_G 8
-#define PAGE_TABLE_ATTR_AVL 9
-//页表属性位
-#define PAGE_DIRECTORY_ATTR_P 0
-#define PAGE_DIRECTORY_ATTR_RW 1
-#define PAGE_DIRECTORY_ATTR_US 2
-#define PAGE_DIRECTORY_ATTR_PWT 3
-#define PAGE_DIRECTORY_ATTR_PCD 4
-#define PAGE_DIRECTORY_ATTR_A 5
-#define PAGE_DIRECTORY_ATTR_AVL_ONE 6
-#define PAGE_DIRECTORY_ATTR_PS 7
-#define PAGE_DIRECTORY_ATTR_AVL_TWO 8
+#define PAGE_SIZE 1024
+//没有实现内存分配之前，先固定下来最大进程的数量，用于确定页面的地址
+#define THREAD_MAX_SIZE 20
+//暂定一个目录只使用一个页 THREAD_MAX_SIZE * PAGE_DIRECTORY_TABLE_SIZE
+#define PAGE_DIRECTORY_MAX_SIZE 20
+#define PAGE_TABLE_MAX_SIZE 20480
 
 /**
  * 参考 https://wiki.osdev.org/Paging
