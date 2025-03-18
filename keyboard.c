@@ -3,7 +3,7 @@
 #include "global.h"
 #include "string.h"
 
-void keybord_interrupt_handle(interrupt_info info)
+void keybord_interrupt_handle(interrupt_info* info)
 {
     char a[100];
     memset(a,0,100);

@@ -2,17 +2,14 @@
 #include "interrupt.h"
 #include "console.h"
 #include "string.h"
+#include "task.h"
 
 u32 tick = 0;
 
-void timer_callback(interrupt_info info)
+int timer_callback(interrupt_info* info)
 {
     tick++;
-    // prints("tick: ");
-    // char a[50];
-    // memset(a, 0, 50);
-    // ntos(a, tick, 10);
-    // printsl(a);
+    return task_switch(info);
 }
 
 void init_time(u32 frequency)
@@ -29,6 +26,4 @@ void init_time(u32 frequency)
    // Send the frequency divisor.
    outb(PORT_CHANNEL_0, divisor & 0xFF);
    outb(PORT_CHANNEL_0, (divisor>>8) & 0xFF);
-
-   printsl("---init time-----");
 }

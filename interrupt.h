@@ -53,11 +53,19 @@
 #define INT_INDEX_CUSTOMER47 47
 
 typedef struct {
-    u32 data_segment; //数据段选择子
-    u32 edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
-    u32 int_no;     //中断号
-    u32 err_code;   //中断错误码
-    u32 eip, cs, eflags, useresp, ss; //中断发生后，cpu自动处理的
+    u32 edi;
+    u32 esi;
+    u32 ebx;
+    u32 edx;
+    u32 ecx;
+    u32 eax;
+    u32 int_no;
+    u32 int_code;
+    u32 eip;
+    u32 cs;
+    u32 flags;
+    u32 sp;
+    u32 ss; //中断发生后，cpu自动处理的
 }__attribute__((packed)) interrupt_info;
 
 //IDT结构
@@ -76,14 +84,15 @@ typedef struct {
 } __attribute__((packed)) idt_descriptor_t;
 
 //自定义中断处理
-typedef void (*customer_interrupt_handle)(interrupt_info);
+typedef u32 (*customer_interrupt_handle)(interrupt_info*);
 customer_interrupt_handle customer_interrupt_handle_table[IDT_TABLE_COUNT];
 
 void init_idt();
 void init_idt_table();
-void exception_handler (interrupt_info info);
+u32 exception_handler (void* pf_address);
 void init_idt_table_entry(u8 index, u8 type, interruptHandler handler, u8 privilege);
 void init_8259A();
 void register_customer_interrupt_handle(u8 index, customer_interrupt_handle handle);
+void print_interrupt(interrupt_info* info);
 
 #endif

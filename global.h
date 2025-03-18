@@ -22,6 +22,7 @@
 #define	PRIVILEGE_TASK	1
 #define	PRIVILEGE_USER	3
 
+#define NULL (0)
 
 //定义基础数据类型
 typedef __signed__ char s8;
@@ -101,5 +102,7 @@ static inline void sti()
 {
     __asm__ volatile ("sti");
 }
+
+u32 kernel_stack;
 
 #endif

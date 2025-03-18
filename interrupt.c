@@ -94,32 +94,27 @@ void init_idt_table_entry(u8 index, u8 type, interruptHandler handler, u8 privil
     idt_table[index].selector = 0x08; //loader里 code段是第二个,对应的0x08
 }
 
-void exception_handler (interrupt_info info) {
-    if (info.int_no != INT_INDEX_CUSTOMER32) {
-        printsl("----exception handle----");
-        prints("no:0x");
-        char a[100];
-        memset(a,0,100);
-        ntos(a, info.int_no, 16);
-        prints(a);
-        prints(" code:0x");
-        memset(a,0,100);
-        ntos(a, info.err_code, 16);
-        prints(a);
-        printc('\n');
-    }
+u32 exception_handler (void* pf_addr) {
+    interrupt_info* info = &pf_addr;
 
-    if (info.int_no >= 40) {
+    static int i=0;
+    if (info->int_no >= 40) {
         //8-16是在从片上
         // Send reset signal to slave.
        outb(SLAVE_COMMAND, 0x20);
     }
     outb(MASTER_COMMAND, 0x20);
     //自定义处理方法
-    if (customer_interrupt_handle_table[info.int_no]) {
-        customer_interrupt_handle handle = customer_interrupt_handle_table[info.int_no];
-        handle(info);
+    if (customer_interrupt_handle_table[info->int_no]) {
+        customer_interrupt_handle handle = customer_interrupt_handle_table[info->int_no];
+        return handle(info);
+    } else {
+        if (i==0) {
+            print_interrupt(info);
+            i++;
+        }
     }
+    return 0;
 }
 
 void init_idt_table() {
@@ -165,4 +160,20 @@ void init_idt_table() {
 void register_customer_interrupt_handle(u8 index, customer_interrupt_handle handle)
 {
     customer_interrupt_handle_table[index] = handle;
+}
+
+void print_interrupt(interrupt_info* info) {
+    print_number("int no:%x ", info->int_no);
+    print_number(" code:%x ", info->int_code);
+    print_number(" cs:%x ", info->cs);
+    // print_number(" sp:%x ", info->sp);
+    // print_number(" ss:%x ", info->ss);
+    // print_number(" flags:%x\n", info->flags);
+    print_number(" eip:%x\n", info->eip);
+    print_number(" eax:%x\n", info->eax);
+    print_number(" ebx:%x\n", info->ebx);
+    print_number(" ecx:%x\n", info->ecx);
+    print_number(" edx:%x\n", info->edx);
+    print_number(" esi:%x\n", info->esi);
+    print_number(" edi:%x\n", info->edi);
 }

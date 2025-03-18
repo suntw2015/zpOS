@@ -37,7 +37,7 @@ void strcat(char *s1, char* s2)
  * @param s 存放的字符串
  * @param value 
  */
-void ntos(char*s, long value, u8 radix)
+void ntos(char*s, u32 value, u8 radix)
 {
     if (value==0) {
         s[0] = '0';

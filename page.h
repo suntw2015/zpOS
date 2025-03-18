@@ -11,6 +11,12 @@
 #define PAGE_DIRECTORY_MAX_SIZE 20
 #define PAGE_TABLE_MAX_SIZE 20480
 
+//帧的最大值，内存暂定16MB
+#define FRAME_MAX_SIZE 4096
+
+// 页地址转为虚拟地址
+#define page2virual(page) ((unsigned long)((page) << 12))
+
 /**
  * 参考 https://wiki.osdev.org/Paging
  * 
@@ -75,16 +81,30 @@ typedef struct
    u32 address    : 20;
 } page_directory_entry;
 
+//物理内存帧使用情况
+//假设物理内存为16MB, 一帧是4KB, 需要需要4096字节存储，使用比特位的话需要 512字节即可
+static char frame_use_map[512];
+
 /**
  * 页错误中断
 */
-void page_interrupt_handle(interrupt_info info);
+void page_interrupt_handle(interrupt_info* info);
+
+void set_frame(u32 index, u8 use);
+u32 find_valid_frame();
 
 /**
  * 加载页目录
 */
 void reload_page_directory(page_directory_entry* dir);
-void print_page();
 void init_page();
+void init_page_table(page_table_entry* table);
+void print_page(page_directory_entry *dir);
+
+void alloc_frame(u32 address, page_directory_entry* dir);
+
+page_directory_entry* clone_page_dir(page_directory_entry* src);
+
+page_directory_entry *kernel_page_dir, *current_page_dir;
 
 #endif

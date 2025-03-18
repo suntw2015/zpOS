@@ -150,7 +150,7 @@ void print_number(char *s, u32 number) {
                 i++;
                 continue;
             } else if (s[i+1] == 'x') {
-                prints("0x:");
+                prints("0x");
                 ntos(a, number, 16);
                 prints(a);
                 i++;

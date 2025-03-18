@@ -60,6 +60,6 @@ static char scan_codes[] =
 };
 
 void init_keyborad();
-void keybord_interrupt_handle(interrupt_info info);
+void keybord_interrupt_handle(interrupt_info* info);
 
 #endif

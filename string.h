@@ -14,7 +14,7 @@ int strpos(const char *target, const char*searh);
  * @param s 存放的字符串
  * @param value 
  */
-void ntos(char*s, long value, u8 radix);
+void ntos(char*s, u32 value, u8 radix);
 
 void memcpy(const void* src, void* dst, u32 size);
 
